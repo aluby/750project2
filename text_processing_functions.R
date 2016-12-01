@@ -11,14 +11,18 @@ filter_unique = function(token.doc){
   return(unique(token.doc, MARGIN=2))
 }
 
-filter_stopwords = function(unique.token.doc, stopword_csv){
+filter_stopwords = function(unique.token.doc, stopword_csv = 'stopwords_xpo6.csv'){
   stopwords = read.csv(stopword_csv, header=FALSE)
   stopwords = as.matrix(stopwords)
-  return(unique.token.doc[!unique.token.doc %in% stopwords])
+  return(t(as.matrix(unique.token.doc[!unique.token.doc %in% stopwords])))
+}
+
+filter_rare = function(weighted_words, nmin = 1){
+  return(t(as.matrix(weighted_words[,which(weighted_words>nmin)])))
 }
 
 weight_by_counts = function(filtered.token, original.token){
-  counts = apply(as.matrix(filtered.token), 1, function(unique_row)
+  counts = apply(as.matrix(filtered.token), 2, function(unique_row)
     {return(sum(unique_row == original.token))})
   counts = t(as.matrix(counts))
   colnames(counts) = filtered.token
@@ -26,8 +30,8 @@ weight_by_counts = function(filtered.token, original.token){
 }
 
 sort_by_weight = function(weights){
-  return(sort(weights, decreasing=TRUE))
-}
-filter_rare = function(weighted_words, nmin = 1){
-  return(weighted_words[,which(weighted_words>nmin)])
+  sorted = sort(weights, decreasing=TRUE, index=TRUE)
+  result = t(as.matrix(sorted$x))
+  colnames(result) = colnames(weights)[sorted$ix]
+  return(result)
 }
