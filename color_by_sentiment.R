@@ -1,6 +1,6 @@
 color_by_sentiment = function(words_to_color, sent_colors = c('gray', 'red', 'purple', 'blue', 'pink',
                                                               'yellow', 'black')){
-  sentiment_dictionary = read.delim('inqtabs.txt')
+  sentiment_dictionary = read.delim('other-text-files/inqtabs.txt')
   negative = tolower(sentiment_dictionary$Entry[sentiment_dictionary$Negativ == 'Negativ'])
   positive = tolower(sentiment_dictionary$Entry[sentiment_dictionary$Positiv == 'Positiv'])
   male = tolower(sentiment_dictionary$Entry[sentiment_dictionary$MALE =='MALE'])

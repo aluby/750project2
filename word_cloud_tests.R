@@ -4,13 +4,13 @@ source('vis_calculation_functions.R')
 
 test_that("tokenize(test) returns 1xn matrix", {
   write.table(c('Now is the time to head west toward wilder lands'), 
-              file='test.txt', col.names=FALSE, row.names=FALSE, quote=FALSE)
-  expect_that(dim(tokenize('test.txt')), equals(c(1,10)))
-  expect_that(class(tokenize('test.txt')), equals('matrix'))
+              file='test-files/test.txt', col.names=FALSE, row.names=FALSE, quote=FALSE)
+  expect_that(dim(tokenize('test-files/test.txt')), equals(c(1,10)))
+  expect_that(class(tokenize('test-files/test.txt')), equals('matrix'))
 })
 
 test_that("tokenize() throws error on file that DNE", {
-  expect_error(tokenize('test1.txt'))
+  expect_error(tokenize('test-files/test1.txt'))
 })
 
 #Sample random files to test functions
@@ -49,15 +49,15 @@ unique_art = filter_unique(art_token)
 
 test_that("filter_stopwords(random_token, stopwords) returns 1xn matrix with no stopwords",{
   stopwords = 'the,vision,art,artist'
-  write.table(stopwords, 'test-stopwords.csv', sep = ",", quote = FALSE, row.names = FALSE, col.names = FALSE)
-  stop_art = filter_stopwords(art_token, stopword_csv = 'test-stopwords.csv')
+  write.table(stopwords, 'test-files/test-stopwords.csv', sep = ",", quote = FALSE, row.names = FALSE, col.names = FALSE)
+  stop_art = filter_stopwords(art_token, stopword_csv = 'test-files/test-stopwords.csv')
   expect_equal(dim(stop_art)[1], 1)
   expect_gte(dim(stop_art)[2], 1)
   expect_equal(class(stop_art), 'matrix')
   expect_equal(sum(c('the', 'vision', 'art', 'artist') %in% stop_art), 0)
 })
 
-filtered_art = filter_stopwords(unique_art, stopword_csv = 'test-stopwords.csv')
+filtered_art = filter_stopwords(unique_art, stopword_csv = 'test-files/test-stopwords.csv')
 
 test_that("weight_by_count(filtered, random) returns 1xm matrix with counts", {
   weights = weight_by_counts(filtered_art, art_token)

@@ -11,7 +11,7 @@ filter_unique = function(token.doc){
   return(unique(token.doc, MARGIN=2))
 }
 
-filter_stopwords = function(unique.token.doc, stopword_csv = 'stopwords_xpo6.csv'){
+filter_stopwords = function(unique.token.doc, stopword_csv = 'other-text-files/stopwords_xpo6.csv'){
   stopwords = read.csv(stopword_csv, header=FALSE, colClasses = "character")
   stopwords = as.matrix(stopwords)
   return(t(as.matrix(unique.token.doc[!unique.token.doc %in% stopwords])))

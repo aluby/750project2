@@ -100,7 +100,7 @@ draw_orig = function(coords, boxes, weights){
       x = coords$x_coord[ind],
       y = coords$y_coord[ind],
       labels = colnames(weights)[ind],
-      cex = weights[ind]/(min(weights)),
+      cex = weights[ind]/min(weights),
       adj = c(0,0)
     )
   }
@@ -114,9 +114,9 @@ redraw_pretty = function(coords, boxes, weights, add_boxes = FALSE, word_color =
   plot.new()
   plot.window(xlim = c(min_x, max_x), ylim = c(min_y, max_y))
   text(x = coords$x_coord, 
-       y = coords$y_coord, 
+       y = coords$y_coord + .25*boxes$height, 
        labels = colnames(weights), 
-       cex = weights/min(weights) *(1/(max_x-min_x)) ,
+       cex = weights/min(weights) * sqrt(1/((max_x-min_x)*(max_y-min_y))),
        adj = c(0,0),
        col = word_color)
   if(add_boxes){add_bounding_boxes(coords, boxes)}
