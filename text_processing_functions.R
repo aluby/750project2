@@ -4,7 +4,7 @@ parse_txt = function(filename){
 
 tokenize = function(docname) {
   document = read.table(docname, colClasses = "character", comment.char = "")
-  return(as.matrix(document))
+  return(t(as.matrix(tolower(document))))
 }
 
 filter_unique = function(token.doc){
@@ -12,7 +12,7 @@ filter_unique = function(token.doc){
 }
 
 filter_stopwords = function(unique.token.doc, stopword_csv = 'stopwords_xpo6.csv'){
-  stopwords = read.csv(stopword_csv, header=FALSE)
+  stopwords = read.csv(stopword_csv, header=FALSE, colClasses = "character")
   stopwords = as.matrix(stopwords)
   return(t(as.matrix(unique.token.doc[!unique.token.doc %in% stopwords])))
 }

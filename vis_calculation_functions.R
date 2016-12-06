@@ -1,7 +1,7 @@
-bounding_box = function(word, hscale = 1, vscale = 1) {
+bounding_box = function(word, weight, hscale = 1, vscale = 1) {
   return(list(
-    height = vscale * strheight(word),
-    width = hscale * strwidth(word)
+    height = vscale * strheight(word) * weight,
+    width = hscale * strwidth(word) * weight
   ))
 }
 
@@ -15,13 +15,13 @@ bounding_box = function(word, hscale = 1, vscale = 1) {
 find_coords = function(word_index) {
   if (word_index == 1) {
     return(list(
-      x_coord = runif(1, min = -.5, max = .5),
-      y_coord = 0
-    ))
+      x_coord = runif(1, min = 0, max = 1),
+      y_coord = .5
+      ))
   }
   return(list(
-    x_coord = runif(1, min = -.5, max = .5),
-    y_coord = runif(1, min = -.5, max = .5)
+    x_coord = runif(1, min = 0, max = 1),
+    y_coord = runif(1, min = 0, max = 1)
   ))
 }
 
@@ -53,8 +53,6 @@ spiral_points = function(x_orig,
 place_words = function(weighted_words, boxes) {
   coords = list(x_coord = rep(NA, length(weighted_words)),
                 y_coord = rep(NA, length(weighted_words)))
-  plot.new()
-  plot.window(xlim = c(-1, 1), ylim = c(-1, 1))
   for (word in 1:length(weighted_words)) {
     test_coords = find_coords(word)
     tries = 1
@@ -79,14 +77,6 @@ place_words = function(weighted_words, boxes) {
     }
     coords$x_coord[word] = test_coords$x_coord
     coords$y_coord[word] = test_coords$y_coord
-    text(
-      x = coords$x_coord[word],
-      y = coords$y_coord[word],
-      labels = colnames(weighted_words)[word],
-      cex = weighted_words[word]/min(weighted_words),
-      adj = c(0,0)
-      #cex = .01
-    )
   }
   return(coords)
 }
@@ -102,18 +92,32 @@ add_bounding_boxes = function(coords, boxes){
   }
 }
 
-redraw_pretty = function(coords, boxes, weights){
+draw_orig = function(coords, boxes, weights){
+  plot.new()
+  plot.window(xlim = c(0, 1), ylim = c(0, 1))
+  for(ind in 1:length(coords$x_coord)){
+    text(
+      x = coords$x_coord[ind],
+      y = coords$y_coord[ind],
+      labels = colnames(weights)[ind],
+      cex = weights[ind]/(min(weights)),
+      adj = c(0,0)
+    )
+  }
+}
+
+redraw_pretty = function(coords, boxes, weights, add_boxes = FALSE, word_color = NULL){
   max_x = max(coords$x_coord + boxes$width)
   min_x = min(coords$x_coord)
   max_y = max(coords$y_coord + boxes$height)
   min_y = min(coords$y_coord)
   plot.new()
-  plot.window(xlim = c(0, 1), ylim = c(0, 1))
-  new_xleft = (coords$x_coord + abs(min_x))/2
-  new_ybottom = (coords$y_coord + abs(min_y))/2
-  text(x = new_xleft, 
-       y = new_ybottom, 
+  plot.window(xlim = c(min_x, max_x), ylim = c(min_y, max_y))
+  text(x = coords$x_coord, 
+       y = coords$y_coord, 
        labels = colnames(weights), 
-       cex = (weights/min(weights))/2,
-       adj = c(0,0))
+       cex = weights/min(weights) *(1/(max_x-min_x)) ,
+       adj = c(0,0),
+       col = word_color)
+  if(add_boxes){add_bounding_boxes(coords, boxes)}
 }

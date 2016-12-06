@@ -98,16 +98,16 @@ test_that("bounding_box(random_word) scales correctly",{
   nchar = sample(1:26, 1)
   rand_chars = toString(sample(letters, nchar))
   rand_word = gsub(', ', '', rand_chars)
-  expect_equal(bounding_box(rand_word, vscale=2)$height, 2*strheight(rand_word))
-  expect_equal(bounding_box(rand_word, hscale=3)$width, 3*strwidth(rand_word))
+  expect_equal(bounding_box(rand_word, 1, vscale=2)$height, 2*strheight(rand_word))
+  expect_equal(bounding_box(rand_word, 1, hscale=3)$width, 3*strwidth(rand_word))
 })
 
 
 test_that("find_coords(word_index) performs as expected",{
-  expect_equal(find_coords(1)$y_coord, 0)
+  expect_equal(find_coords(1)$y_coord, .5)
   for(loops in 1:100){
-  expect_false(find_coords(sample(1:100,1))$y_coord == 0)
-  expect_false(find_coords(sample(1:100,1))$x_coord == 0)
+  expect_false(find_coords(sample(2:100,1))$y_coord == 0)
+  expect_false(find_coords(sample(1:100,1))$x_coord == .5)
   expect_lt(abs(find_coords(sample(1:100,1))$y_coord),1)
   expect_lt(abs(find_coords(sample(1:100,1))$x_coord), 1)
   }
