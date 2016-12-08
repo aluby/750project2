@@ -72,17 +72,23 @@ place_words = function(weighted_words, boxes) {
                          word)
       tries = tries + 1
     }
-    if (tries > nrow(points_to_try)) {
-      print(c('Fail ', word))
-    }
     coords$x_coord[word] = test_coords$x_coord
     coords$y_coord[word] = test_coords$y_coord
+    if (tries > nrow(points_to_try)) {
+      print(paste('Word could not be placed: ', colnames(weighted_words)[word]))
+      coords$x_coord[word] = 0
+      coords$y_coord[word] = 0
+      boxes$width[word] = 0
+      boxes$height[word] = 0
+    }
+    
   }
-  return(coords)
+  return(list(coords = coords, boxes = boxes))
 }
 
 add_bounding_boxes = function(coords, boxes){
   for(ind in 1:length(coords$x_coord)){
+    if(!is.na(coords$x_coord[ind]))
     rect(
       xleft = coords$x_coord[ind],
       xright = coords$x_coord[ind] + boxes$width[ind],
@@ -95,15 +101,14 @@ add_bounding_boxes = function(coords, boxes){
 draw_orig = function(coords, boxes, weights){
   plot.new()
   plot.window(xlim = c(0, 1), ylim = c(0, 1))
-  for(ind in 1:length(coords$x_coord)){
+  coords$x_coord[boxes$width == 0] = -50
     text(
-      x = coords$x_coord[ind],
-      y = coords$y_coord[ind],
-      labels = colnames(weights)[ind],
-      cex = weights[ind]/min(weights),
+      x = coords$x_coord,
+      y = coords$y_coord,
+      labels = colnames(weights),
+      cex = boxes$width / strwidth(colnames(weights)),
       adj = c(0,0)
     )
-  }
 }
 
 redraw_pretty = function(coords, boxes, weights, add_boxes = FALSE, word_color = NULL){
@@ -111,13 +116,19 @@ redraw_pretty = function(coords, boxes, weights, add_boxes = FALSE, word_color =
   min_x = min(coords$x_coord)
   max_y = max(coords$y_coord + boxes$height)
   min_y = min(coords$y_coord)
+  #dev.new(width = (max_x - min_x)*2, height = (max_y - min_y))
+  png('images/word_cloud_pretty.png')
   plot.new()
   plot.window(xlim = c(min_x, max_x), ylim = c(min_y, max_y))
+  coords$x_coord[boxes$width == 0] = -50
   text(x = coords$x_coord, 
-       y = coords$y_coord + .25*boxes$height, 
+       y = coords$y_coord + .25 * boxes$height, 
        labels = colnames(weights), 
-       cex = weights/min(weights) * sqrt(1/((max_x-min_x)*(max_y-min_y))),
+       cex = boxes$width / strwidth(colnames(weights)),
+       #lheight = boxes$height,
+       #ps = weights,
        adj = c(0,0),
        col = word_color)
   if(add_boxes){add_bounding_boxes(coords, boxes)}
+  dev.off()
 }

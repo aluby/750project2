@@ -18,7 +18,7 @@ filter_stopwords = function(unique.token.doc, stopword_csv = 'other-text-files/s
 }
 
 filter_rare = function(weighted_words, nmin = 1){
-  return(t(as.matrix(weighted_words[,which(weighted_words>nmin)])))
+  return(t(as.matrix(weighted_words[,which(weighted_words>=nmin)])))
 }
 
 weight_by_counts = function(filtered.token, original.token){
