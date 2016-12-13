@@ -51,13 +51,13 @@ args = commandArgs(trailingOnly=TRUE)
 if (length(args)==0) {
   stop("Please provide space-separated text file", call. = FALSE)
 }
-if (length(args) == 1){
+else if (length(args) == 1){
   word_cloud(args)
 }
-if (length(args) == 7){
+else if (length(args) == 7){
   word_cloud(args[1], as.numeric(args[2]), as.numeric(args[3]), as.numeric(args[4]), 
              as.logical(args[5]), as.logical(args[6]), as.logical(args[7]))
 }
-if (length(args)>1 & length(args) !=7){
+else{
   stop("Please provide ONLY the filename, or all seven function arguments in order", call. = FALSE)
 }

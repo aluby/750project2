@@ -38,6 +38,7 @@ overlaps = function(test_x_coord,
     test_box_xrange[2] > other_words_xrange[, 1]
   overlaps_y = test_box_yrange[1] < other_words_yrange[, 2] &
     test_box_yrange[2] > other_words_yrange[, 1]
+  #instead return any(overlaps_x & overlaps_y)
   return(overlaps_x & overlaps_y)
 }
 
@@ -50,17 +51,18 @@ spiral_points = function(x_orig,
   return(cbind(x = r * cos(t) + x_orig, y = r * sin(t) + y_orig))
 }
 
+#Note: when determining overlap and placing words, I'm using bottom left corner as reference
 place_words = function(weighted_words, boxes) {
   coords = list(x_coord = rep(NA, length(weighted_words)),
                 y_coord = rep(NA, length(weighted_words)))
-  for (word in 1:length(weighted_words)) {
-    test_coords = find_coords(word)
+  for (word_index in 1:length(weighted_words)) {
+    test_coords = find_coords(word_index)
     tries = 1
     overlap = overlaps(test_coords$x_coord,
                        test_coords$y_coord,
                        coords,
                        boxes,
-                       word)
+                       word_index)
     points_to_try = spiral_points(test_coords$x_coord, test_coords$y_coord, change = .2)
     while (sum(overlap, na.rm = TRUE) > 0 & tries <= nrow(points_to_try)) {
       test_coords$x_coord = points_to_try[tries, 1]
@@ -69,17 +71,18 @@ place_words = function(weighted_words, boxes) {
                          test_coords$y_coord,
                          coords,
                          boxes,
-                         word)
+                         word_index)
       tries = tries + 1
     }
-    coords$x_coord[word] = test_coords$x_coord
-    coords$y_coord[word] = test_coords$y_coord
+    coords$x_coord[word_index] = test_coords$x_coord
+    coords$y_coord[word_index] = test_coords$y_coord
     if (tries > nrow(points_to_try)) {
-      print(paste('Word could not be placed: ', colnames(weighted_words)[word]))
-      coords$x_coord[word] = 0
-      coords$y_coord[word] = 0
-      boxes$width[word] = 0
-      boxes$height[word] = 0
+      #look into adding 'message' here instead
+      print(paste('Word could not be placed: ', colnames(weighted_words)[word_index]))
+      coords$x_coord[word_index] = 0
+      coords$y_coord[word_index] = 0
+      boxes$width[word_index] = 0
+      boxes$height[word_index] = 0
     }
     
   }
@@ -111,13 +114,14 @@ draw_orig = function(coords, boxes, weights){
     )
 }
 
-redraw_pretty = function(coords, boxes, weights, add_boxes = FALSE, word_color = NULL){
+redraw_pretty = function(coords, boxes, weights, add_boxes = FALSE, word_color = NULL, 
+                         out_filename = 'images/word_cloud_pretty.png'){
   max_x = max(coords$x_coord + boxes$width)
   min_x = min(coords$x_coord)
   max_y = max(coords$y_coord + boxes$height)
   min_y = min(coords$y_coord)
   #dev.new(width = (max_x - min_x)*2, height = (max_y - min_y))
-  png('images/word_cloud_pretty.png')
+  png(out_filename)
   plot.new()
   plot.window(xlim = c(min_x, max_x), ylim = c(min_y, max_y))
   coords$x_coord[boxes$width == 0] = -50
@@ -129,6 +133,8 @@ redraw_pretty = function(coords, boxes, weights, add_boxes = FALSE, word_color =
        #ps = weights,
        adj = c(0,0),
        col = word_color)
-  if(add_boxes){add_bounding_boxes(coords, boxes)}
+  if(add_boxes){
+    add_bounding_boxes(coords, boxes)
+  }
   dev.off()
 }
