@@ -1,6 +1,0 @@
-This archive contains two directories, "art" and "music", containing a random
-selection of stories from the _New York Times Annotated Corpus_ which were
-tagged as being about, respectively, art and music.  All of these files
-have the text extracted and weakly normalized (removing all punctuation,
-replacing numbers by #, and convertingn to lower case) for easier
-processing.

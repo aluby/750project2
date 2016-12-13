@@ -1,6 +1,6 @@
 # 750project2
 
-![alt text](./images/m_obama_pretty.png)
+![alt text](./images/m_obama.png)
 
 ## Description
 
